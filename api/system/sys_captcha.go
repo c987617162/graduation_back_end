@@ -12,6 +12,12 @@ import (
 var store = base64Captcha.DefaultMemStore
 
 // Captcha  生成验证码
+// @Tags Base
+// @Summary 生成验证码
+// @Security
+// @Produce  application/json
+// @Success 200 {object} systemRes.SysCaptchaResponse "生成验证码"
+// @Router /base/captcha [get]
 func (b *BaseApi) Captcha(c *gin.Context) {
 	// 字符,公式,验证码配置
 	// 生成默认数字的driver

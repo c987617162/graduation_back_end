@@ -1,9 +1,10 @@
-package init
+package initialize
 
 import (
 	"github.com/gin-gonic/gin"
 	ginSwagger "github.com/swaggo/gin-swagger"
 	"github.com/swaggo/gin-swagger/swaggerFiles"
+	_ "server/docs"
 	"server/global"
 	SysR "server/router/system"
 )
@@ -23,7 +24,7 @@ func Routers() *gin.Engine {
 		})
 	}
 	{
-		systemRouter.InitUserRouter(PublicGroup)
+		systemRouter.InitUserRouter(PublicGroup) //用户组路由
 	}
 
 	global.GVA_LOG.Info("router register success")

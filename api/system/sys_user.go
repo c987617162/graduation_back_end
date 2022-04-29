@@ -18,6 +18,12 @@ type BaseApi struct{}
 var userService = SysService.UserService{}
 
 // Login 登录
+// @Tags SysUser
+// @Summary 用户登录
+// @Produce  application/json
+// @Param data body Req.Login true "用户名, 密码, 验证码"
+// @Success 200 {object} response.Response{data=Res.LoginResponse,msg=string} "返回包括用户信息,token,过期时间"
+// @Router /user/login [post]
 func (b *BaseApi) Login(c *gin.Context) {
 	var l Req.Login
 	_ = c.ShouldBind(&l)
@@ -64,6 +70,12 @@ func (b *BaseApi) tokenNext(c *gin.Context, user system.SysUser) {
 }
 
 // Register 注册用户
+// @Tags SysUser
+// @Summary 用户注册账号
+// @Produce  application/json
+// @Param data body Req.Register true "用户名, 昵称, 密码, 角色ID"
+// @Success 200 {object} response.Response{data=Res.SysUserResponse,msg=string} "用户注册账号,返回包括用户信息"
+// @Router /user/admin_register [post]
 func (b *BaseApi) Register(c *gin.Context) {
 	var r Req.Register
 	_ = c.ShouldBind(&r)
@@ -88,7 +100,7 @@ func (b *BaseApi) Register(c *gin.Context) {
 	err, userReturm := userService.Register(*user)
 	if err != nil {
 		global.GVA_LOG.Error("注册失败", zap.Error(err))
-		response.FailWithDetailed(Res.SysUserResponse{User: userReturm}, "注册失败", c)
+		response.FailWithDetailed(Res.SysUserResponse{User: userReturm}, err.Error(), c)
 	} else {
 		response.OkWithDetailed(Res.SysUserResponse{User: userReturm}, "注册成功", c)
 	}
@@ -96,6 +108,13 @@ func (b *BaseApi) Register(c *gin.Context) {
 }
 
 // ChangePassword 更改密码
+// @Tags SysUser
+// @Summary 用户修改密码
+// @Security ApiKeyAuth
+// @Produce  application/json
+// @Param data body Req.ChangePasswordStruct true "用户名, 原密码, 新密码"
+// @Success 200 {object} response.Response{msg=string} "用户修改密码"
+// @Router /user/changePassword [post]
 func (b *BaseApi) ChangePassword(c *gin.Context) {
 	var user Req.ChangePasswordStruct
 	_ = c.ShouldBindJSON(&user)
@@ -113,6 +132,14 @@ func (b *BaseApi) ChangePassword(c *gin.Context) {
 }
 
 // GetUserList 分页获取用户列表
+// @Tags SysUser
+// @Summary 分页获取用户列表
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param data body request.PageInfo true "页码, 每页大小"
+// @Success 200 {object} response.Response{data=response.PageResult,msg=string} "分页获取用户列表,返回包括列表,总数,页码,每页数量"
+// @Router /user/getUserList [post]
 func (b *BaseApi) GetUserList(c *gin.Context) {
 	var pageInfo request.PageInfo
 	_ = c.ShouldBindJSON(&pageInfo)
@@ -134,6 +161,14 @@ func (b *BaseApi) GetUserList(c *gin.Context) {
 }
 
 // DeleteUser 删除用户
+// @Tags SysUser
+// @Summary 删除用户
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param data body request.GetById true "用户ID"
+// @Success 200 {object} response.Response{msg=string} "删除用户"
+// @Router /user/deleteUser [delete]
 func (b *BaseApi) DeleteUser(c *gin.Context) {
 	var reqId request.GetById
 	_ = c.ShouldBindJSON(&reqId)
@@ -155,6 +190,14 @@ func (b *BaseApi) DeleteUser(c *gin.Context) {
 }
 
 // SetUserInfo 设置用户信息
+// @Tags SysUser
+// @Summary 设置用户信息
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param data body system.SysUser true "ID, 用户名, 昵称, 头像链接"
+// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "设置用户信息"
+// @Router /user/setUserInfo [put]
 func (b *BaseApi) SetUserInfo(c *gin.Context) {
 	var user Req.ChangeUserInfo
 	_ = c.ShouldBind(&user)
@@ -179,6 +222,14 @@ func (b *BaseApi) SetUserInfo(c *gin.Context) {
 }
 
 // SetSelfInfo 设置用户信息
+// @Tags SysUser
+// @Summary 设置用户信息
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Param data body system.SysUser true "ID, 用户名, 昵称, 头像链接"
+// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "设置用户信息"
+// @Router /user/SetSelfInfo [put]
 func (b *BaseApi) SetSelfInfo(c *gin.Context) {
 	var user Req.ChangeUserInfo
 	_ = c.ShouldBindJSON(&user)
@@ -199,6 +250,13 @@ func (b *BaseApi) SetSelfInfo(c *gin.Context) {
 }
 
 // GetUserInfo 获取用户信息
+// @Tags SysUser
+// @Summary 获取用户信息
+// @Security ApiKeyAuth
+// @accept application/json
+// @Produce application/json
+// @Success 200 {object} response.Response{data=map[string]interface{},msg=string} "获取用户信息"
+// @Router /user/getUserInfo [get]
 func (b *BaseApi) GetUserInfo(c *gin.Context) {
 	uuid := utils.GetUserUuid(c)
 	if err, ReqUser := userService.GetUserInfo(uuid); err != nil {
@@ -210,6 +268,13 @@ func (b *BaseApi) GetUserInfo(c *gin.Context) {
 }
 
 // ResetPassword 重置密码
+// @Tags SysUser
+// @Summary 重置用户密码
+// @Security ApiKeyAuth
+// @Produce  application/json
+// @Param data body system.SysUser true "ID"
+// @Success 200 {object} response.Response{msg=string} "重置用户密码"
+// @Router /user/resetPassword [post]
 func (b *BaseApi) ResetPassword(c *gin.Context) {
 	var user system.SysUser
 	_ = c.ShouldBindJSON(&user)

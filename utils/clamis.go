@@ -8,11 +8,11 @@ import (
 )
 
 func GetClaims(c *gin.Context) (*systemReq.CustomClaims, error) {
-	token := c.Request.Header.Get("x-token")
+	token := c.Request.Header.Get("Authorization")
 	j := NewJWT()
 	claims, err := j.ParseToken(token)
 	if err != nil {
-		global.GVA_LOG.Error("从Gin的Context中获取从jwt解析信息失败, 请检查请求头是否存在x-token且claims是否为规定结构")
+		global.GVA_LOG.Error("从Gin的Context中获取从jwt解析信息失败, 请检查请求头是否存在Authorization且claims是否为规定结构")
 	}
 	return claims, err
 }
